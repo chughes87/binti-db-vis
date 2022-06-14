@@ -1,26 +1,22 @@
-import { withRouter } from 'next/router'
-import dynamic from 'next/dynamic'
-import Link from 'next/link'
+import React, { useEffect } from 'react'
+import Head from "next/head";
+import * as d3 from "d3";
+import { graphviz } from "d3-graphviz";
+// import * as graphviz from 'd3-graphviz';
 
-const RustComponent = dynamic({
-  loader: async () => {
-    // Import the wasm module
-    const rustModule = await import('../add.wasm')
-    // Return a React component that calls the add_one method on the wasm module
-    return (props) => <div>{rustModule.add_one(props.number)}</div>
-  },
-})
+export default function Home() {
+  useEffect(() => {
+    let x = d3.select("#graph")
+    graphviz(d3.select("#graph"), { useWorker: false, }).renderDot("digraph  {a -> b}")
+  }, []);
 
-const Page = ({ router: { query } }) => {
-  const number = parseInt(query.number || 30)
   return (
-    <div>
-      <RustComponent number={number} />
-      <Link href={`/?number=${number + 1}`}>
-        <a>+</a>
-      </Link>
-    </div>
-  )
+    <>
+      <Head>
+        <script src="https://unpkg.com/@hpcc-js/wasm/dist/index.min.js" type="application/javascript/"></script>
+      </Head>
+      <div id="graph">
+      </div>
+    </>
+  );
 }
-
-export default withRouter(Page)
